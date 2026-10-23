@@ -3,5 +3,6 @@ data/*.tmp
 data/*.bak
 .env
 node_modules/
+.wrangler/
 .DS_Store
 npm-debug.log*

@@ -64,18 +64,23 @@ POST https://your-domain.example/api/payments/yookassa/webhook
 - Разместить оферту, политику конфиденциальности, правила гарантии и возврата, реквизиты продавца.
 - Проверить юридическую возможность продавать каждый тип аккаунтов.
 
-## Публикация через GitHub и Render
+## Бесплатная публикация через GitHub и Cloudflare Workers + D1
 
-GitHub хранит исходный код, а Node.js-сервер запускается на Render или другом Node.js-хостинге. Файл `render.yaml` уже содержит настройки web-сервиса, health-check и постоянный диск `/var/data` для JSON-базы.
+GitHub хранит исходный код, Cloudflare Worker запускает API, а D1 хранит состояние магазина. Worker не засыпает как бесплатный Render Web Service. Бесплатный D1 имеет лимит 500 МБ на базу, поэтому этот вариант подходит для небольшого магазина и тестового запуска, но не заменяет полноценную production-базу с резервными копиями.
 
-1. Создайте пустой репозиторий GitHub и отправьте в него этот проект. Файлы `.env`, `data/db.json` и `node_modules` намеренно исключены из репозитория.
-2. В Render выберите `New Blueprint` и подключите репозиторий. Render прочитает `render.yaml`.
-3. В переменных окружения задайте реальные значения `APP_ORIGIN=https://slowy.lol`, `ADMIN_EMAIL`, `ADMIN_PASSWORD`, `ENCRYPTION_KEY`, SMTP и YooKassa. Не вставляйте секреты в Git.
-4. В Cloudflare добавьте домен `slowy.lol` в Custom Domains Render и внесите выданные Render DNS-записи. После выпуска SSL переключите `APP_ORIGIN` на `https://slowy.lol`.
-5. В YooKassa укажите webhook `https://slowy.lol/api/payments/yookassa/webhook`.
-6. После первого запуска войдите в админку и импортируйте проверенный инвентарь. Локальная база не переносится автоматически, чтобы не публиковать персональные данные и секреты.
+1. Установите Node.js и выполните `npm install`.
+2. Авторизуйте Wrangler: `npx wrangler login`.
+3. Создайте D1: `npx wrangler d1 create slowyshop`.
+4. Вставьте выданный `database_id` в `wrangler.jsonc` вместо `REPLACE_WITH_D1_DATABASE_ID`.
+5. Примените схему: `npx wrangler d1 migrations apply slowyshop --remote`.
+6. Добавьте секреты командами `npx wrangler secret put ADMIN_PASSWORD`, `ENCRYPTION_KEY`, `RESEND_API_KEY`, `YOOKASSA_SHOP_ID` и `YOOKASSA_SECRET_KEY`.
+7. Перед деплоем добавьте секрет `APP_ORIGIN` через `npx wrangler secret put APP_ORIGIN` со значением `https://slowy.lol`, а email задайте секретом `EMAIL_FROM`.
+8. Опубликуйте: `npm run cf:deploy`.
+9. Конфигурация уже содержит Custom Domain `slowy.lol`. SSL и DNS для активной зоны Cloudflare выдаются автоматически после `npm run cf:deploy`.
+10. В YooKassa укажите webhook `https://slowy.lol/api/payments/yookassa/webhook`.
+11. После первого запуска войдите в админку и импортируйте проверенный инвентарь. Локальная база не переносится автоматически, чтобы не публиковать персональные данные и секреты.
 
-Для текущей JSON-базы нужен постоянный диск или внешний PostgreSQL. Не используйте бесплатный ephemeral-диск для реальных заказов: при перезапуске данные могут исчезнуть.
+Для Resend нужен API key и подтвержденный адрес отправителя. SMTP напрямую из Worker не используется, потому что Worker не открывает обычные SMTP-порты.
 
 ## Telegram-бот заявок
 
