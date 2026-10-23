@@ -1,46 +1,55 @@
 {
-  "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "slowyshop",
-  "main": "worker.js",
-  "compatibility_date": "2026-10-23",
-  "routes": [
-    {
-      "pattern": "slowy.lol",
-      "custom_domain": true
-    }
-  ],
-  "assets": {
-    "directory": ".",
-    "binding": "ASSETS",
-    "run_worker_first": ["/api/*"]
-  },
-  "d1_databases": [
-    {
-      "binding": "DB",
-      "database_name": "slowyshop",
-      "database_id": "REPLACE_WITH_D1_DATABASE_ID",
-      "migrations_dir": "migrations"
-    }
-  ],
-  "durable_objects": {
-    "bindings": [
-      {
-        "name": "COORDINATOR",
-        "class_name": "StoreCoordinator"
-      }
-    ]
-  },
-  "migrations": [
-    {
-      "tag": "v1",
-      "new_sqlite_classes": ["StoreCoordinator"]
-    }
-  ],
-  "vars": {
-    "NODE_ENV": "production",
-    "PAYMENT_MODE": "yookassa",
-    "COOKIE_SECURE": "true",
-    "EMAIL_REQUIRED": "true",
-    "SEED_DEMO_INVENTORY": "false"
-  }
+	"$schema": "node_modules/wrangler/config-schema.json",
+	"name": "slowyshop",
+	"main": "worker.js",
+	"compatibility_date": "2026-10-23",
+	"routes": [
+		{
+			"pattern": "slowy.lol",
+			"custom_domain": true
+		}
+	],
+	"assets": {
+		"directory": ".",
+		"binding": "ASSETS",
+		"run_worker_first": [
+			"/api/*"
+		]
+	},
+	"d1_databases": [
+		{
+			"binding": "DB",
+			"database_name": "slowyshop",
+      "database_id": "ecf0d395-4218-4c7b-8f4c-51ac4896d553",
+			"migrations_dir": "migrations"
+		},
+		{
+			"binding": "slowyshop",
+			"database_name": "slowyshop",
+			"database_id": "ecf0d395-4218-4c7b-8f4c-51ac4896d553"
+		}
+	],
+	"durable_objects": {
+		"bindings": [
+			{
+				"name": "COORDINATOR",
+				"class_name": "StoreCoordinator"
+			}
+		]
+	},
+	"migrations": [
+		{
+			"tag": "v1",
+			"new_sqlite_classes": [
+				"StoreCoordinator"
+			]
+		}
+	],
+	"vars": {
+		"NODE_ENV": "production",
+		"PAYMENT_MODE": "yookassa",
+		"COOKIE_SECURE": "true",
+		"EMAIL_REQUIRED": "true",
+		"SEED_DEMO_INVENTORY": "false"
+	}
 }
