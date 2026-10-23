@@ -3,6 +3,8 @@ services:
     name: slowyshop
     env: node
     plan: 1c-2g
+    domains:
+      - slowy.lol
     buildCommand: npm ci
     startCommand: npm start
     healthCheckPath: /api/health
